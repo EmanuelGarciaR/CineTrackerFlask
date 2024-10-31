@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 from cine_traker import TraktAuth
 from dotenv import load_dotenv
 
@@ -16,7 +16,7 @@ trakt_auth = TraktAuth(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
 
 
 @app.route('/')
-def home():
+def url_auth():
     # Generar la URL de autorización
     auth_url = trakt_auth.get_authorization_url()
     return render_template('auth_template.html', auth_url=auth_url)
@@ -29,18 +29,27 @@ def get_token():
 
     if not auth_code:
         flash('Por favor, ingresa el código de autorización.', "error")
-        return redirect(url_for('home'))
+        return redirect(url_for('url_auth'))
 
     # Obtener el token de acceso usando el código de autorización
     access_token = trakt_auth.get_access_token(auth_code)
 
     if access_token:
+        session['access_token'] = access_token
         flash(f"Bienvenido", "success")
+        return redirect(url_for('home'))
         #Si se quiere mostrar el {access_token}
     else:
         flash('Error al obtener el token de acceso. Intenta nuevamente.', "error")
 
-    return redirect(url_for('home'))
+    return redirect(url_for('url_auth'))
+
+@app.route("/home_page")
+def home():
+    if 'access_token' not in session:
+        flash("Debes iniciar sesión para acceder a esta página.", "error")
+        return redirect(url_for('url_auth'))
+    return render_template("base_main.html")
 
 
 if __name__ == '__main__':

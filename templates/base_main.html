@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Autenticación{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/base_main.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/CineTracker.JPG') }}">
+    {% block additional_css %} <!--link adicional de css-->{% endblock %}
+</head>
+<body>
+    <nav class="nav_container">
+        <section class="sec_logo" >
+            <img class="logo" src="{{ url_for('static', filename='img/CineTracker-removebg.png') }}" alt="Cine Traker Logo">
+        </section>
+
+        <section class="sec_main">
+            <ul class="main">
+                <li>
+                    <a href="#">Tendencia</a>
+                </li>
+                <li>
+                    <a href="#">Seguimiento</a>
+                </li>
+                <li>
+                    <a href="#">Vistas</a>
+                </li>
+                <li>
+                    <a href="#">Favoritas</a>
+                </li>
+                <li>
+                    <a href="#">OtraLista</a>
+                </li>
+                <li>
+                    <a href="#">OtraLista</a>
+                </li>
+                <li>
+                    <a href="#">OtraLista</a>
+                </li>
+                <li>
+                    <a href="#">OtraLista</a>
+                </li>
+            </ul>
+        </section>
+    </nav>
+
+    {% block content %}
+    <!-- Contenido de las páginas que heredan de baseAuth -->
+    {% endblock %}
+</body>
+</html>

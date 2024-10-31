@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Oswald", sans-serif;
+}
+body{
+    background-image: url(../img/telon.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.nav_container{
+    display: flex;
+    width: 100%;
+    height: auto;
+    backdrop-filter: blur(5px);
+}
+.sec_logo{
+    width: 35%;
+    height: auto;
+}
+.logo{
+    height: 140px;
+}
+.sec_main{
+    display: flex;
+    width: 65%;
+    height: auto;
+}
+.main{
+    display: flex;
+    width: 100%;
+    height: auto;
+    justify-content: space-between;
+    align-items: center;
+    margin-right: 20px;
+}
+li{
+    list-style: none;
+}
+a{
+    color: white;
+    text-decoration: none;
+    letter-spacing: 2px;
+}
+
+a:hover{
+    color: rgb(253, 240, 117);
+}
