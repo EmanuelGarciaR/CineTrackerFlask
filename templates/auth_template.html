@@ -1,0 +1,29 @@
+{% extends 'base_auth.html' %}
+
+{% block title %}Formulario de Autenticación{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='CSS/auth.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="auth-container">
+        <form action="/get-token" method="POST">
+            <h1 class="auth_title">Autenticación</h1>
+            <a href="{{auth_url}}" target="_blank">Link para Registrar / Iniciar Sesión</a>
+            <input type="text" id="auth_code" name="auth_code" placeholder="Ingrese el código de auth" required>
+            <button type="submit">Enviar</button>
+        </form>
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <ul>
+                    {% for category, message in messages %}
+                        <li class="flash-message {{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+</section>
+{% endblock %}

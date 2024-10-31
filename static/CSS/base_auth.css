@@ -1,0 +1,24 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.nav-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: auto;
+    width: 70%;
+}
+
+.nav_logo {
+    max-width: 500px;
+    height: auto;
+}
+
+body{
+    display: flex;
+    background-image: url(../img/telon.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+}

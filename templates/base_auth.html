@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Autenticación{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/base_auth.css') }}">
+    <link rel="shortcut icon" href="../static/img/CineTracker.JPG">
+    {% block additional_css %} <!--link adicional de css-->{% endblock %}
+</head>
+<body>
+    <nav class="nav-container">
+        <img class="nav_logo" src="{{ url_for('static', filename='img/CineTracker-removebg.png') }}" alt="Cine Traker Logo">
+    </nav>
+
+    {% block content %}
+    <!-- Contenido de las páginas que heredan de baseAuth -->
+    {% endblock %}
+
+</body>
+</html>

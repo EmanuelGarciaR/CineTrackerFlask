@@ -1,0 +1,89 @@
+* {
+    color: rgb(184, 184, 184);
+    margin: 0; /* Evitar márgenes por defecto */
+    padding: 0; /* Evitar padding por defecto */
+    box-sizing: border-box; /* Incluir padding y border en ancho y alto total */
+}
+
+html, body {
+    height: 100%; /* Asegurar que el body ocupe toda la altura */
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    height: 50%; 
+    width: auto;
+    max-width: 380px; 
+    padding: 20px;
+    margin-right: 100px;
+    display: flex; 
+    justify-content: center; /* Centrar contenido horizontalmente */
+    align-items: center; /* Centrar contenido verticalmente */
+    background: rgba(115, 35, 38, 0.8); /* Fondo con opacidad para el modal */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Sombra para darle profundidad */
+}
+
+.auth-container {
+    margin: 0px 20px 0px 20px;
+    display: flex;
+    flex-direction: column; /* Asegurar que los elementos se apilen verticalmente */
+    align-items: center; /* Centrar elementos dentro de auth-container */
+}
+
+.auth_title{
+    padding-bottom: 2rem;
+}
+
+form {
+    display: flex;
+    flex-direction: column; /* Asegurar que los elementos del formulario se apilen verticalmente */
+    gap: 20px; /* Espacio entre elementos */
+    width: auto; /* Ancho del formulario */
+    text-align: center;
+}
+
+#auth_code,
+button {
+    padding: 10px; /* Espaciado interno */
+    font-size: 16px; /* Tamaño de fuente */
+}
+#auth_code{
+    color: #505050;
+}
+
+button {
+    background-color: #b63c3c; /* Color de fondo del botón */
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #e78a8a; /* Color de fondo al pasar el mouse */
+}
+
+a{
+    color: #bdbdbd;
+}
+
+/*Estilos mensaje de error*/
+.flash-message {
+    padding: 6px;
+    margin-top: 15px;
+    border-radius: 5px;
+    color: white;
+    list-style: none;
+}
+.flash-message.error {
+    background-color: #e74c3c;
+}
+.flash-message.success {
+    background-color: #2ecc71;
+}
