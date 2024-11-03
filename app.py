@@ -3,6 +3,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from cine_traker import TraktAuth
 from dotenv import load_dotenv
+from errors.error import *
 
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASH_SECRET')
@@ -31,18 +32,16 @@ def get_token():
         flash('Por favor, ingresa el código de autorización.', "error")
         return redirect(url_for('url_auth'))
 
-    # Obtener el token de acceso usando el código de autorización
-    access_token = trakt_auth.get_access_token(auth_code)
-
-    if access_token:
+    try:
+        # Obtener el token de acceso usando el código de autorización
+        access_token = trakt_auth.get_access_token(auth_code)
         session['access_token'] = access_token
         flash(f"Bienvenido", "success")
+        redirect(url_for('home'))
         return redirect(url_for('home'))
-        #Si se quiere mostrar el {access_token}
-    else:
-        flash('Error al obtener el token de acceso. Intenta nuevamente.', "error")
-
-    return redirect(url_for('url_auth'))
+    except TokenRequestError as err:
+        flash(err.args[0], err.args[1])
+        return redirect(url_for('url_auth'))
 
 @app.route("/home_page")
 def home():

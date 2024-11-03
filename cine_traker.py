@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from errors.error import *
 import requests
 
 class TraktAuth:
@@ -29,9 +29,7 @@ class TraktAuth:
             self.access_token = token_data['access_token']
             return self.access_token
         else:
-            print(f"Error al obtener el token: {response.status_code}")
-            print(f"Respuesta: {response.text}")
-            return None
+            raise TokenRequestError(f"Error al obtener el token para acceder", "error")
 
 
 class TraktApi:
@@ -57,8 +55,7 @@ class TraktApi:
         if response.status_code == 200:
             return response.json()  # Retorna el perfil del usuario
         else:
-            print(f"Error al obtener el perfil: {response.status_code}")
-            return None
+            raise ApiRequestError("Error al obtener el perfil de usuario", "error")
 
     def get_watched_movies(self) -> list[dict[str, str]] | None:
         """Obtiene las películas YA vistas por el usuario"""
@@ -69,8 +66,7 @@ class TraktApi:
         if response.status_code == 200:
             return response.json()  # Lista de diccionarios con las películas vistas
         else:
-            print(f"Error al obtener las películas vistas: {response.status_code}")
-            return None
+            raise ApiRequestError("Error al obtener la lista de peliculas vistas", "error")
 
     def get_watchlist_movies(self) -> list[dict[str, str]] | None:
         """Obtiene la lista de seguimiento del usuario"""
@@ -81,8 +77,7 @@ class TraktApi:
         if response.status_code == 200:
             return response.json()  # Lista de diccionarios con las películas en la lista de seguimiento
         else:
-            print(f"Error al obtener la lista de seguimiento: {response.status_code}")
-            return None
+            raise ApiRequestError("Error al obtener la lista de películas en seguimiento", "error")
 
     def get_trend_movies(self) -> list[dict[str, str]] | None:
         """Obtiene las películas en tendencia"""
@@ -93,8 +88,8 @@ class TraktApi:
         if response.status_code == 200:
             return response.json()  # Lista de diccionarios con las películas en tendencia
         else:
-            print(f"Error al obtener las películas en tendencia: {response.status_code}")
-            return None
+            raise ApiRequestError("Error al obtener la lista de películas en tendencia", "error")
+
 
 
 class User(TraktApi):
@@ -167,5 +162,5 @@ class MovieList:
         """Muestra las películas almacenadas en la lista."""
         if not self.movies:
             #Hacer error de que no hay películas
-            return("No hay películas en la lista.")
+            raise EmptyList("No hay películas almacenadas en la lista")
         return [movie for movie in self.movies]
