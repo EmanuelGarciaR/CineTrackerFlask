@@ -116,6 +116,17 @@ class TraktApi:
         else:
             raise ApiRequestError("Error al obtener la lista de películas favoritas", "error")
 
+    def get_cinema_movies(self)-> list[dict[str, str]] | None:
+        """Obtiene las películas favoritas"""
+        headers = self.get_headers()
+        url = f"{self.API_URL}/movies/boxoffice"
+        response = requests.get(url, headers= headers)
+    
+        if response.status_code == 200:
+            return response.json()  # Lista de diccionarios con las películas favoritas
+        else:
+            raise ApiRequestError("Error al obtener la lista de películas en cartelera", "error")
+
 class ImageTMDB:
     def __init__(self):
         self.api_key = os.getenv('TMDB_ID')  # API Key para solicitudes
@@ -241,6 +252,32 @@ class User(TraktApi):
 
         if fav_movies:
             for item in fav_movies:
+                movie_title = item['movie']['title']
+                movie_year = item['movie']['year']
+                movie_id = item['movie']['ids']['tmdb']
+
+                try:
+                    movie_images = self.image_tmdb.get_movie_images(movie_id)
+                    poster_image = movie_images[0] if movie_images else "static/img/fondo_gris.jpg"
+                    
+                    # Agregar la información de la película a la lista
+                    movies_data.append({
+                        'title': movie_title,
+                        'year': movie_year,
+                        'poster_image': poster_image
+                    })
+                except ErrorFetchImage as e:
+                    print(f"Error al obtener imágenes para {movie_title}: {e}")
+
+        return movies_data
+    
+    def get_cinema_list(self):
+        """Obtiene y almacena las películas YA VISTAS del usuario en una lista."""
+        cine_movies = self.get_cinema_movies()
+        movies_data = []  # Lista para almacenar los datos de las películas
+
+        if cine_movies:
+            for item in cine_movies[:10]:
                 movie_title = item['movie']['title']
                 movie_year = item['movie']['year']
                 movie_id = item['movie']['ids']['tmdb']
