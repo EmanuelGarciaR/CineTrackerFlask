@@ -12,3 +12,10 @@ class ApiRequestError(CineTrakerError):
 
 class EmptyList(CineTrakerError):
     pass
+
+class PostersError(CineTrakerError):
+    pass
+
+
+class ErrorFetchImage(CineTrakerError):
+    pass

@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Oswald", serif;
+}
+.container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    width: 100%;
+}
+.list-title{
+    text-align: center;
+    color: white;
+    margin-bottom: 20px;
+}
+.movie-list{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.movie-card{
+    height: auto;
+    width: 200px;
+    margin-bottom: 10px;
+}
+.movie-visual{
+    height: 250px;
+    width: auto;
+}
+.movie-poster{
+    height: 100%;
+    width: 100%;
+}
+.movie-info{
+    height: auto;
+    width: 100%;
+}
+.movie-title, .movie-year, p{
+    text-align: center;
+    color: white;
+}

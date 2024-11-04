@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Autenticación{% endblock %}</title>
+    <title>{% block title %}Cine Traker{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='CSS/base_main.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/CineTracker.JPG') }}">
     {% block additional_css %} <!--link adicional de css-->{% endblock %}
@@ -16,30 +16,14 @@
 
         <section class="sec_main">
             <ul class="main">
-                <li>
-                    <a href="#">Tendencia</a>
-                </li>
-                <li>
-                    <a href="#">Seguimiento</a>
-                </li>
-                <li>
-                    <a href="#">Vistas</a>
-                </li>
-                <li>
-                    <a href="#">Favoritas</a>
-                </li>
-                <li>
-                    <a href="#">OtraLista</a>
-                </li>
-                <li>
-                    <a href="#">OtraLista</a>
-                </li>
-                <li>
-                    <a href="#">OtraLista</a>
-                </li>
-                <li>
-                    <a href="#">OtraLista</a>
-                </li>
+                <li><a href="#">Tendencia</a></li>
+                <li><a href="#">Seguimiento</a></li>
+                <li><a href="{{ url_for('viewed_movies') }}">Vistas</a></li>
+                <li><a href="#">Favoritas</a></li>
+                <li><a href="#">OtraLista</a></li>
+                <li><a href="#">OtraLista</a></li>
+                <li><a href="#">OtraLista</a></li>
+                <li><a href="#">OtraLista</a></li>
             </ul>
         </section>
     </nav>

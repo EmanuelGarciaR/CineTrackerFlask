@@ -1,0 +1,30 @@
+{% extends 'base_main.html' %}
+
+{% block title %}Cine Traker - Películas{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='CSS/movies.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="container">
+    <h1 class="list-title">{{ list_title }}</h1>
+    {% if movies %}
+        <div class="movie-list">
+            {% for movie in movies %}
+                <section class="movie-card">
+                    <section class="movie-visual">
+                        <img src="{{ movie.poster }}" alt="{{ movie.title }}" class="movie-poster">
+                    </section>
+                    <div class="movie-info">
+                        <h3 class="movie-title">{{ movie.title }}</h3>
+                        <p class="movie-year">{{ movie.year }}</p>
+                    </div>
+                </section>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No hay películas en esta lista.</p>
+    {% endif %}
+</section>
+{% endblock %}
