@@ -44,35 +44,48 @@ def home():
     if 'access_token' not in session:
         flash("Debes iniciar sesión para acceder a esta página.", "error")
         return redirect(url_for('url_auth'))
-    
+
     try:
         user = User(CLIENT_ID, session['access_token'])
-        user.get_watch_list()  # Llamar al método para obtener la lista de películas por ver
-        watch_movies = user.show_list("Películas por ver")  # Obtener la lista de películas por ver
-        return render_template("base_main.html", watch_movies=watch_movies)  # Pasar la lista a la plantilla
+        user.get_watch_list()  # Llama al método para obtener las listas del usuario (no lo retornamos)
+        #Llamar todo los metodos de lista del usuario, pero no los retornamos aun
+        return render_template("base_main.html")  # Renderiza una plantilla que sirva como menú principal
     except ErrorFetchImage as err:
         flash(err.args[0], err.args[1])
-        return render_template("base_main.html", watch_movies=[])  # Pasar lista vacía en caso de error
-    except Exception as e:  # Manejar otros posibles errores
-        flash("Ha ocurrido un error. Por favor, inténtalo de nuevo.", "error")
-        return redirect(url_for('url_auth'))
+        return render_template("base_main.html")  # Renderiza la plantilla de inicio con un mensaje de error
+    except Exception as e:
+        flash("Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.", "error")
+        return render_template("base_main.html")  # Renderiza la plantilla de inicio
 
-@app.route("/watch_movies")
-def watch_list_movies():
+
+@app.route('/watchlist')
+def watchlist():
     if 'access_token' not in session:
         flash("Debes iniciar sesión para acceder a esta página.", "error")
         return redirect(url_for('url_auth'))
-    
-    user = User(CLIENT_ID, session['access_token'])
-    try:
-        user.get_watch_list()  # Obtener la lista de películas por ver
-        watch_movies = user.show_list("Películas por ver")  # Obtener la lista almacenada
 
-        return render_template("movies_viewed.html", movies=watch_movies)  # Renderizar el template
-    except ErrorFetchImage as err:
-        flash(err.args[0], err.args[1])
-        watch_movies = []  # En caso de error, no mostrar películas
-        return render_template("movies_viewed.html", movies=watch_movies)  # Pasar lista vacía en caso de error
+    user = User(CLIENT_ID, session['access_token'])  # Usar el token de acceso de la sesión
+    movies_data = user.get_watch_list()  # Obtener la lista de películas por ver
+    return render_template('base_card_movie.html', list_title="Películas por ver", movies=movies_data)
+
+
+
+# @app.route("/watch_movies")
+# def watch_list_movies():
+#     if 'access_token' not in session:
+#         flash("Debes iniciar sesión para acceder a esta página.", "error")
+#         return redirect(url_for('url_auth'))
+    
+#     user = User(CLIENT_ID, session['access_token'])
+#     try:
+#         user.get_watch_list()  # Obtener la lista de películas por ver
+#         watch_movies = user.show_list("Películas por ver")  # Obtener la lista almacenada
+
+#         return render_template("movies_viewed.html", movies=watch_movies)  # Renderizar el template
+#     except ErrorFetchImage as err:
+#         flash(err.args[0], err.args[1])
+#         watch_movies = []  # En caso de error, no mostrar películas
+#         return render_template("movies_viewed.html", movies=watch_movies)  # Pasar lista vacía en caso de error
 
 if __name__ == '__main__':
     app.run(debug=True)
