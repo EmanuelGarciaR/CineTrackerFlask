@@ -133,7 +133,30 @@ class User(TraktApi):
         self.lists: dict[str, list] = {}
         self.image_tmdb = ImageTMDB()
 
-    def get_movies_viewed(self):
+    def get_watch_list(self):
+        """Obtiene y almacena las películas por ver del usuario en una lista."""
+        watch_movies = self.get_watchlist_movies()
+        if watch_movies:
+            list_movies_watch = MovieList("Películas por ver")
+            
+            for item in watch_movies:
+                movie_title = item['movie']['title']
+                movie_year = item['movie']['year']
+                movie_id = item['movie']['ids']['trakt']
+
+                movie_details = self.get_movie_details(movie_id)
+                if movie_details:
+                    movie_images = self.image_tmdb.get_movie_images(movie_id)
+                    if movie_images:
+                        poster_image = movie_images[0]  # Decir si es la primera imagen
+                    else:
+                        raise ErrorFetchImage("No se pudo obtener las imagenes", "error") #Si no hay imagenes
+                    movie = Movie(movie_title, movie_year, poster_image)
+                    list_movies_watch.add_movie(movie)
+            self.add_list("Películas por ver", list_movies_watch)
+
+
+    def get_watched_list(self):
         """Obtiene y almacena las películas vistas del usuario en una lista."""
         watched_movies = self.get_watched_movies()
         if watched_movies:
@@ -168,12 +191,11 @@ class User(TraktApi):
                 movie_title = item['movie']['title']
                 movie_year = item['movie']['year']
                 movie_id = item['movie']['ids']['trakt']
+                print(movie_id)
 
                 movie_details = self.get_movie_details(movie_id)
                 if movie_details:
                     movie_images = self.image_tmdb.get_movie_images(movie_id)
-                    list_movies_trend.add_movie(movie)
-                    
                     if movie_images:
                         poster_image = movie_images[0]  # Decir si es la primera imagen
                     else:

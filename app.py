@@ -51,11 +51,11 @@ def home():
     try:
         user.get_movies_viewed()  # Obtener las películas vistas
         viewed_movies = user.show_list("Películas vistas")  # Usar un valor por defecto vacío
+        return render_template("movies_viewed.html", viewed_movies=viewed_movies)
     except ErrorFetchImage as err:
         flash(err.args[0], err.args[1])
         viewed_movies = []  # En caso de error, no mostrar películas
-
-    return render_template("base_main.html", viewed_movies=viewed_movies)
+        return render_template("base_main.html")
 
 @app.route("/viewed_movies")
 def viewed_movies():
@@ -67,11 +67,44 @@ def viewed_movies():
     try:
         user.get_movies_viewed()  # Método para obtener las películas vistas
         viewed_movies = user.show_list("Películas vistas")
+        return render_template("movies_viewed.html", movies=viewed_movies)
     except ErrorFetchImage as err:
         flash(err.args[0], err.args[1])
         viewed_movies = []  # En caso de error, no mostrar películas
+        return render_template("base_main.html")
 
-    return render_template("movies_viewed.html", movies=viewed_movies)
+
+@app.route("/watch_movies")
+def watch_list_movies():
+    if 'access_token' not in session:
+        flash("Debes iniciar sesión para acceder a esta página.", "error")
+        return redirect(url_for('url_auth'))
+    
+    user = User(CLIENT_ID, session['access_token'])
+    try:
+        user.get_watch_list()  # Método para obtener las películas vistas
+        watch_movies = user.show_list("Películas por ver")
+        return render_template("movies_viewed.html", movies=watch_movies)
+    except ErrorFetchImage as err:
+        flash(err.args[0], err.args[1])
+        watch_movies = []  # En caso de error, no mostrar películas
+        return render_template("movies_viewed.html")
+
+# @app.route("/trend_movies")
+# def trend_movies():
+#     if 'access_token' not in session:
+#         flash("Debes iniciar sesión para acceder a esta página.", "error")
+#         return redirect(url_for('url_auth'))
+    
+#     user = User(CLIENT_ID, session['access_token'])
+#     try:
+#         user.get_trend_list()  # Método para obtener las películas vistas
+#         trend_movies = user.show_list("Películas en tendencia")
+#         return render_template("movies_viewed.html", movies=trend_movies)
+#     except ErrorFetchImage as err:
+#         flash(err.args[0], err.args[1])
+#         viewed_movies = []  # En caso de error, no mostrar películas
+#         return render_template("movies_viewed.html", movies=viewed_movies)
 
 if __name__ == '__main__':
     app.run(debug=True)
