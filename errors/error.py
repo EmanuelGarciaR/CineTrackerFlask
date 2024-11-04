@@ -10,6 +10,9 @@ class TokenRequestError(CineTrakerError):
 class ApiRequestError(CineTrakerError):
     pass
 
+class ApiRequestProfileError(CineTrakerError):
+    pass
+
 class EmptyList(CineTrakerError):
     pass
 

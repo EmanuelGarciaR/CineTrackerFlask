@@ -47,28 +47,32 @@ class TraktApi:
             "trakt-api-key": self.CLIENT_ID
         }
 
-    def get_profile(self) -> dict[str, str] | None:
+    def get_user_info(self):
         """Obtiene la información del perfil del usuario autenticado."""
         headers = self.get_headers()
-        url = f"{self.API_URL}/users/id"
+        url = f"{self.API_URL}/users/settings"
         response = requests.get(url, headers=headers)
 
         if response.status_code == 200:
-            return response.json()  # Retorna el perfil del usuario
+            data = response.json()
+            username = data["user"]["username"]
+            user_id = data["user"]["ids"]["slug"]
+            
+            profile_info = {
+                "user_name" : username, 
+                "user_id" : user_id
+                }
+            return profile_info
         else:
-            raise ApiRequestError("Error al obtener el perfil de usuario", "error")
-        
-    def get_user_id(self):
-        profile = self.get_profile()
-        if profile and "ids" in profile:
-            return profile["ids"].get("slug")  # Extrae el 'slug' del perfil
-        else:
-            raise ApiRequestError("No se pudo obtener el ID del usuario", "error")
+            raise ApiRequestProfileError("Error al obtener el perfil de usuario", "error")
 
     def get_watched_movies(self) -> list[dict[str, str]] | None:
         """Obtiene las películas YA vistas por el usuario"""
+        user_info = self.get_user_info()
+        user_id = user_info.get("user_id")
+        
         headers = self.get_headers()
-        url = f"{self.API_URL}/sync/watched/movies"
+        url = f"{self.API_URL}/users/{user_id}/watched/movies"
         response = requests.get(url, headers=headers)
 
         if response.status_code == 200:
@@ -78,8 +82,11 @@ class TraktApi:
 
     def get_watchlist_movies(self) -> list[dict[str, str]] | None:
         """Obtiene la lista de seguimiento del usuario"""
+        user_info = self.get_user_info()
+        user_id = user_info.get("user_id")
+        
         headers = self.get_headers()
-        url = f"{self.API_URL}/users/EmaGarcia/watchlist/movies/rank"
+        url = f"{self.API_URL}/users/{user_id}/watchlist/movies/rank"
         response = requests.get(url, headers=headers)
 
         if response.status_code == 200:
@@ -97,9 +104,6 @@ class TraktApi:
             return response.json()  # Lista de diccionarios con las películas en tendencia
         else:
             raise ApiRequestError("Error al obtener la lista de películas en tendencia", "error")
-
-import os
-import requests
 
 class ImageTMDB:
     def __init__(self):
@@ -167,38 +171,36 @@ class User(TraktApi):
 
         return movies_data
 
-    # def get_watch_list(self):
-    #     """Obtiene y almacena las películas por ver del usuario en una lista."""
-    #     watch_movies = self.get_watchlist_movies()
-    #     movies_data = []  # Lista para almacenar los datos de las películas
+    def get_watched_list(self):
+        """Obtiene y almacena las películas YA VISTAS del usuario en una lista."""
+        watched_movies = self.get_watched_movies()
+        movies_data = []  # Lista para almacenar los datos de las películas
 
-    #     if watch_movies:
-    #         for item in watch_movies:
-    #             movie_title = item['movie']['title']
-    #             movie_year = item['movie']['year']
-    #             movie_id = item['movie']['ids']['tmdb']
+        if watched_movies:
+            for item in watched_movies:
+                movie_title = item['movie']['title']
+                movie_year = item['movie']['year']
+                movie_id = item['movie']['ids']['tmdb']
 
-    #             movie_images = self.image_tmdb.get_movie_images(movie_id)
-    #             poster_image = movie_images[0] if movie_images else "static/img/fondo_gris.jpg"
-                
-    #             # Agregar la información de la película a la lista
-    #             movies_data.append({
-    #                 'title': movie_title,
-    #                 'year': movie_year,
-    #                 'poster_image': poster_image
-    #             })
+                try:
+                    movie_images = self.image_tmdb.get_movie_images(movie_id)
+                    poster_image = movie_images[0] if movie_images else "static/img/fondo_gris.jpg"
+                    
+                    # Agregar la información de la película a la lista
+                    movies_data.append({
+                        'title': movie_title,
+                        'year': movie_year,
+                        'poster_image': poster_image
+                    })
+                except ErrorFetchImage as e:
+                    print(f"Error al obtener imágenes para {movie_title}: {e}")
 
-    #     return movies_data
+        return movies_data
 
     
     def get_name(self):
         info_user = self.get_profile()
         return info_user.get("name")
-
-    # def add_list(self, list_name: str, movie_list):
-    #     """Agrega una lista de películas al usuario."""
-    #     #dict[str,list[str]]
-    #     self.lists[list_name] = movie_list
 
     def show_list(self, list_name: str):
         """Muestra la lista de películas solicitada."""
@@ -219,7 +221,7 @@ class User(TraktApi):
 
 
 class Movie:
-    """Representa una película con su título y año."""
+    """Representa una película con su título, año y poster."""
     def __init__(self, title: str, year: str, poster_image: str= None):
         #Poner en el construcro poster_img
         #self.poster: str = poster
@@ -237,14 +239,3 @@ class MovieList:
     def __init__(self, name: str):
         self.name: str = name
         self.movies: list[Movie] = []
-
-    # def add_movie(self, movie: Movie):
-    #     """Agrega una película a la lista."""
-    #     self.movies.append(movie)
-
-    # def show_movies(self):
-    #     """Muestra las películas almacenadas en la lista."""
-    #     if not self.movies:
-    #         #Hacer error de que no hay películas
-    #         raise EmptyList("No hay películas almacenadas en la lista")
-    #     return [movie for movie in self.movies]
