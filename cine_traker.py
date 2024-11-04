@@ -105,6 +105,17 @@ class TraktApi:
         else:
             raise ApiRequestError("Error al obtener la lista de películas en tendencia", "error")
 
+    def get_favorited_movies(self)-> list[dict[str, str]] | None:
+        """Obtiene las películas favoritas"""
+        headers = self.get_headers()
+        url = f"{self.API_URL}/movies/favorited/weekly"
+        response = requests.get(url, headers= headers)
+    
+        if response.status_code == 200:
+            return response.json()  # Lista de diccionarios con las películas favoritas
+        else:
+            raise ApiRequestError("Error al obtener la lista de películas favoritas", "error")
+
 class ImageTMDB:
     def __init__(self):
         self.api_key = os.getenv('TMDB_ID')  # API Key para solicitudes
@@ -197,6 +208,31 @@ class User(TraktApi):
 
         return movies_data
 
+    def get_trend_list(self):
+        """Obtiene y almacena las películas YA VISTAS del usuario en una lista."""
+        trend_movies = self.get_trend_movies()
+        movies_data = []  # Lista para almacenar los datos de las películas
+
+        if trend_movies:
+            for item in trend_movies[:8]:
+                movie_title = item['movie']['title']
+                movie_year = item['movie']['year']
+                movie_id = item['movie']['ids']['tmdb']
+
+                try:
+                    movie_images = self.image_tmdb.get_movie_images(movie_id)
+                    poster_image = movie_images[0] if movie_images else "static/img/fondo_gris.jpg"
+                    
+                    # Agregar la información de la película a la lista
+                    movies_data.append({
+                        'title': movie_title,
+                        'year': movie_year,
+                        'poster_image': poster_image
+                    })
+                except ErrorFetchImage as e:
+                    print(f"Error al obtener imágenes para {movie_title}: {e}")
+
+        return movies_data
     
     def get_name(self):
         info_user = self.get_profile()

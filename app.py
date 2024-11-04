@@ -58,7 +58,7 @@ def home():
         return render_template("base_main.html")  # Renderiza la plantilla de inicio
 
 
-@app.route('/watchlist')
+@app.route('/watch-list')
 def watchlist():
     if 'access_token' not in session:
         flash("Debes iniciar sesión para acceder a esta página.", "error")
@@ -68,7 +68,7 @@ def watchlist():
     movies_data = user.get_watch_list()  # Obtener la lista de películas por ver
     return render_template('base_card_movie.html', list_title="Películas por ver", movies=movies_data)
 
-@app.route('/watchedlist')
+@app.route('/watched-list')
 def watchedlist():
     if 'access_token' not in session:
         flash("Debes iniciar sesión para acceder a esta página.", "error")
@@ -77,6 +77,16 @@ def watchedlist():
     user = User(CLIENT_ID, session['access_token'])  # Usar el token de acceso de la sesión
     movies_data = user.get_watched_list()  # Obtener la lista de películas por ver
     return render_template('base_card_movie.html', list_title="Películas Vistas", movies=movies_data)
+
+@app.route('/trend-list')
+def trendlist():
+    if 'access_token' not in session:
+        flash("Debes iniciar sesión para acceder a esta página.", "error")
+        return redirect(url_for('url_auth'))
+
+    user = User(CLIENT_ID, session['access_token'])  # Usar el token de acceso de la sesión
+    movies_data = user.get_trend_list()  # Obtener la lista de películas por ver
+    return render_template('base_card_movie.html', list_title="Películas en Tendencia", movies=movies_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
