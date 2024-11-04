@@ -58,16 +58,12 @@ class TraktApi:
         else:
             raise ApiRequestError("Error al obtener el perfil de usuario", "error")
         
-    def get_movie_details(self, movie_id):
-        headers = self.get_headers()
-        url = f"https://api.trakt.tv/movies/{movie_id}"
-        response = requests.get(url, headers=headers)
-    
-        if response.status_code == 200:
-            movie_data = response.json()
-            return movie_data
+    def get_user_id(self):
+        profile = self.get_profile()
+        if profile and "ids" in profile:
+            return profile["ids"].get("slug")  # Extrae el 'slug' del perfil
         else:
-            raise PostersError("Error al obtener las portadas de las películas", "error")
+            raise ApiRequestError("No se pudo obtener el ID del usuario", "error")
 
     def get_watched_movies(self) -> list[dict[str, str]] | None:
         """Obtiene las películas YA vistas por el usuario"""
@@ -83,7 +79,7 @@ class TraktApi:
     def get_watchlist_movies(self) -> list[dict[str, str]] | None:
         """Obtiene la lista de seguimiento del usuario"""
         headers = self.get_headers()
-        url = f"{self.API_URL}/sync/watchlist/movies"
+        url = f"{self.API_URL}/users/EmaGarcia/watchlist/movies/rank"
         response = requests.get(url, headers=headers)
 
         if response.status_code == 200:
@@ -109,23 +105,31 @@ class ImageTMDB:
         self.image_base_url = "https://image.tmdb.org/t/p/w500"
 
     def get_movie_images(self, movie_id):
+        #El movie_id es el de tmdb
         """Obtiene las imágenes (posters y backdrops) de una película por su ID"""
         url = f"{self.base_url}/movie/{movie_id}/images"
         params = {"api_key": self.api_key}
         
         response = requests.get(url, params=params)
-        if response.status_code == 200:
-            images_data = response.json()
-            # Obtener la lista de backdrops
+        try:
+            response = requests.get(url, params=params)
+            response.raise_for_status()  # Lanza una excepción si el código de estado no es 200
+
+            try:
+                images_data = response.json()
+            except ValueError:
+                raise ErrorFetchImage("Error al analizar la respuesta JSON", "error")
+
             backdrops = images_data.get('backdrops', [])
-
-            # Crear una lista con las URLs completas de las imágenes
-            backdrop_urls = [f"{self.image_base_url}{backdrop['file_path']}" for backdrop in backdrops]
-
+            
+            backdrop_urls = [
+                f"{self.image_base_url}{backdrop['file_path']}" 
+                for backdrop in backdrops if 'file_path' in backdrop
+            ]
             return backdrop_urls
+        except requests.exceptions.RequestException as e:
+            raise ErrorFetchImage(f"Error al realizar la solicitud: {e}", "error")
 
-        else:
-            raise ErrorFetchImage("No se pudo obtener las imagenes", "error")
 
 class User(TraktApi):
     def __init__(self, CLIENT_ID, access_token = None):
@@ -138,22 +142,20 @@ class User(TraktApi):
         watch_movies = self.get_watchlist_movies()
         if watch_movies:
             list_movies_watch = MovieList("Películas por ver")
-            
             for item in watch_movies:
                 movie_title = item['movie']['title']
                 movie_year = item['movie']['year']
-                movie_id = item['movie']['ids']['trakt']
+                movie_id = item['movie']['ids']['tmdb']
 
-                movie_details = self.get_movie_details(movie_id)
-                if movie_details:
-                    movie_images = self.image_tmdb.get_movie_images(movie_id)
-                    if movie_images:
-                        poster_image = movie_images[0]  # Decir si es la primera imagen
-                    else:
-                        raise ErrorFetchImage("No se pudo obtener las imagenes", "error") #Si no hay imagenes
-                    movie = Movie(movie_title, movie_year, poster_image)
-                    list_movies_watch.add_movie(movie)
+                movie_images = self.image_tmdb.get_movie_images(movie_id)
+                if movie_images:
+                    poster_image = movie_images[0]
+                else:
+                    poster_image = "static/img/fondo_gris.jpg"
+                movie = Movie(movie_title, movie_year, poster_image)
+                list_movies_watch.add_movie(movie)
             self.add_list("Películas por ver", list_movies_watch)
+        return list_movies_watch
 
 
     def get_watched_list(self):
@@ -165,21 +167,18 @@ class User(TraktApi):
             for item in watched_movies:
                 movie_title = item['movie']['title']
                 movie_year = item['movie']['year']
-                movie_id = item['movie']['ids']['trakt']
+                movie_id = item['movie']['ids']['tmdb']
 
-                movie_details = self.get_movie_details(movie_id)
-                if movie_details:
-                    movie_images = self.image_tmdb.get_movie_images(movie_id)
-                    list_movies_viewed.add_movie(movie)
-                    
-                    if movie_images:
-                        poster_image = movie_images[0]  # Decir si es la primera imagen
-                    else:
-                        raise ErrorFetchImage("No se pudo obtener las imagenes", "error") #Si no hay imagenes
-                    
-                    movie = Movie(movie_title, movie_year, poster_image)
-                    list_movies_viewed.add_movie(movie)
+                movie_images = self.image_tmdb.get_movie_images(movie_id)
+                if movie_images:
+                    poster_image = movie_images[0]
+                else:
+                    raise ErrorFetchImage("No se pudo obtener las imagenes", "error")
+                
+                movie = Movie(movie_title, movie_year, poster_image)
+                list_movies_viewed.add_movie(movie)
             self.add_list("Películas vistas", list_movies_viewed)
+
 
     def get_trend_list(self):
         #Obtiene las películas en tendencia
@@ -190,42 +189,35 @@ class User(TraktApi):
             for item in list_movies_trend:
                 movie_title = item['movie']['title']
                 movie_year = item['movie']['year']
-                movie_id = item['movie']['ids']['trakt']
-                print(movie_id)
+                movie_id = item['movie']['ids']['tmdb']
 
-                movie_details = self.get_movie_details(movie_id)
-                if movie_details:
-                    movie_images = self.image_tmdb.get_movie_images(movie_id)
-                    if movie_images:
-                        poster_image = movie_images[0]  # Decir si es la primera imagen
-                    else:
-                        raise ErrorFetchImage("No se pudo obtener las imagenes", "error") #Si no hay imagenes
-                    
-                    movie = Movie(movie_title, movie_year, poster_image)
-                    list_movies_trend.add_movie(movie)
-            self.add_list("Películas en tendencia", list_movies_trend)
+                movie_images = self.image_tmdb.get_movie_images(movie_id)
+                if movie_images:
+                    poster_image = movie_images[0]
+                else:
+                    raise ErrorFetchImage("No se pudo obtener las imagenes", "error")
+                
+                movie = Movie(movie_title, movie_year, poster_image)
+                list_movies_trend.add_movie(movie)
+            self.add_list("Películas vistas", list_movies_trend)
 
     
     def get_name(self):
         info_user = self.get_profile()
-        if info_user["name"]:
-            return info_user["name"]
-        else:
-            return None
+        return info_user.get("name")
 
-    def add_list(self, list_name: str, movie_list: list[str]):
+    def add_list(self, list_name: str, movie_list):
         """Agrega una lista de películas al usuario."""
         #dict[str,list[str]]
         self.lists[list_name] = movie_list
 
     def show_list(self, list_name: str):
-        """Muestra una lista específica del usuario."""
         movie_list = self.lists.get(list_name)
         if movie_list:
             movie_list.show_movies()
         else:
-            return None
-            #Hacer error de no se encontró la lista
+            raise ListNotFoundError(f"La lista '{list_name}' no fue encontrada", "error")
+
 
     def show_all_lists(self):
         """Muestra todas las listas de películas del usuario"""
@@ -247,8 +239,9 @@ class Movie:
         self.poster_image: str = poster_image
 
     def __str__(self):
+        if self.poster_image:
+            return f"{self.title} ({self.year}) - Poster: {self.poster_image}"
         return f"{self.title} ({self.year})"
-
 
 class MovieList:
     """Representa una lista de películas."""

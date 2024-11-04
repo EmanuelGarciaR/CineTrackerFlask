@@ -19,3 +19,6 @@ class PostersError(CineTrakerError):
 
 class ErrorFetchImage(CineTrakerError):
     pass
+
+class ListNotFoundError(CineTrakerError):
+    pass

@@ -1,0 +1,64 @@
+/* Estilos generales para la sección del contenedor */
+.container {
+    max-width: 1200px; /* Ancho máximo del contenedor */
+    margin: 0 auto; /* Centrar el contenedor */
+    padding: 20px; /* Espaciado interno */
+}
+
+.list-title {
+    text-align: center; /* Centrar el título */
+    font-size: 2.5em; /* Tamaño del texto del título */
+    margin-bottom: 20px; /* Espaciado debajo del título */
+    color: #333; /* Color del texto */
+}
+
+/* Estilos para la lista de películas */
+.movie-list {
+    display: grid; /* Usar grid para la disposición */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Columnas responsivas */
+    gap: 20px; /* Espaciado entre las tarjetas */
+}
+
+/* Estilos para cada tarjeta de película */
+.movie-card {
+    background-color: #fff; /* Color de fondo de la tarjeta */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra de la tarjeta */
+    overflow: hidden; /* Ocultar contenido que sobresale */
+    transition: transform 0.3s; /* Transición suave al pasar el mouse */
+}
+
+.movie-card:hover {
+    transform: translateY(-5px); /* Levantar la tarjeta al pasar el mouse */
+}
+
+/* Estilos para la visualización de la película */
+.movie-visual {
+    width: 100%; /* Ancho completo de la tarjeta */
+    height: 300px; /* Altura fija para las imágenes */
+    overflow: hidden; /* Ocultar el desbordamiento */
+}
+
+.movie-poster {
+    width: 100%; /* Ancho completo */
+    height: 100%; /* Altura completa */
+    object-fit: cover; /* Ajustar la imagen para cubrir el contenedor */
+}
+
+/* Estilos para la información de la película */
+.movie-info {
+    padding: 10px; /* Espaciado interno */
+    text-align: center; /* Centrar el texto */
+}
+
+.movie-title {
+    font-size: 1.5em; /* Tamaño del texto del título de la película */
+    margin: 0; /* Eliminar margen */
+    color: #333; /* Color del texto */
+}
+
+.movie-year {
+    font-size: 1em; /* Tamaño del texto del año */
+    color: #666; /* Color más claro para el año */
+    margin-top: 5px; /* Espaciado superior */
+}
