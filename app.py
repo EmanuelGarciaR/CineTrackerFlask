@@ -108,5 +108,25 @@ def cinelist():
     movies_data = user.get_cinema_list()  # Obtener la lista de películas por ver
     return render_template('base_card_movie.html', list_title="Películas en Cine", movies=movies_data)
 
+@app.route('/coming-list')
+def cominglist():
+    if 'access_token' not in session:
+        flash("Debes iniciar sesión para acceder a esta página.", "error")
+        return redirect(url_for('url_auth'))
+
+    user = User(CLIENT_ID, session['access_token'])  # Usar el token de acceso de la sesión
+    movies_data = user.get_anticipated_list()  # Obtener la lista de películas por ver
+    return render_template('base_card_movie.html', list_title="Películas en Cine", movies=movies_data)
+
+@app.route('/recommended-list')
+def recommendedlist():
+    if 'access_token' not in session:
+        flash("Debes iniciar sesión para acceder a esta página.", "error")
+        return redirect(url_for('url_auth'))
+
+    user = User(CLIENT_ID, session['access_token'])  # Usar el token de acceso de la sesión
+    movies_data = user.get_recommended_list()  # Obtener la lista de películas por ver
+    return render_template('base_card_movie.html', list_title="Películas en Cine", movies=movies_data)
+
 if __name__ == '__main__':
     app.run(debug=True)

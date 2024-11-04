@@ -127,6 +127,28 @@ class TraktApi:
         else:
             raise ApiRequestError("Error al obtener la lista de películas en cartelera", "error")
 
+    def get_anticipated_movies(self)-> list[dict[str, str]] | None:
+        """Obtiene las películas favoritas"""
+        headers = self.get_headers()
+        url = f"{self.API_URL}/movies/anticipated"
+        response = requests.get(url, headers= headers)
+    
+        if response.status_code == 200:
+            return response.json()  # Lista de diccionarios con las películas favoritas
+        else:
+            raise ApiRequestError("Error al obtener la lista de películas próximas a estrenar", "error")
+
+    def get_recommended_movies(self)-> list[dict[str, str]] | None:
+        """Obtiene las películas favoritas"""
+        headers = self.get_headers()
+        url = f"{self.API_URL}/recommendations/movies?ignore_collected=false&ignore_watchlisted=false"
+        response = requests.get(url, headers= headers)
+    
+        if response.status_code == 200:
+            return response.json()  # Lista de diccionarios con las películas favoritas
+        else:
+            raise ApiRequestError("Error al obtener la lista de películas próximas a estrenar", "error")
+
 class ImageTMDB:
     def __init__(self):
         self.api_key = os.getenv('TMDB_ID')  # API Key para solicitudes
@@ -220,7 +242,7 @@ class User(TraktApi):
         return movies_data
 
     def get_trend_list(self):
-        """Obtiene y almacena las películas YA VISTAS del usuario en una lista."""
+        """Obtiene y almacena las películas en tendencia del usuario en una lista."""
         trend_movies = self.get_trend_movies()
         movies_data = []  # Lista para almacenar los datos de las películas
 
@@ -281,6 +303,59 @@ class User(TraktApi):
                 movie_title = item['movie']['title']
                 movie_year = item['movie']['year']
                 movie_id = item['movie']['ids']['tmdb']
+
+                try:
+                    movie_images = self.image_tmdb.get_movie_images(movie_id)
+                    poster_image = movie_images[0] if movie_images else "static/img/fondo_gris.jpg"
+                    
+                    # Agregar la información de la película a la lista
+                    movies_data.append({
+                        'title': movie_title,
+                        'year': movie_year,
+                        'poster_image': poster_image
+                    })
+                except ErrorFetchImage as e:
+                    print(f"Error al obtener imágenes para {movie_title}: {e}")
+
+        return movies_data
+    
+    def get_anticipated_list(self):
+        """Obtiene y almacena las películas prontas a estrenar en cine en una lista."""
+        cine_movies = self.get_anticipated_movies()
+        movies_data = []  # Lista para almacenar los datos de las películas
+
+        if cine_movies:
+            for item in cine_movies[:10]:
+                movie_title = item['movie']['title']
+                movie_year = item['movie']['year']
+                movie_id = item['movie']['ids']['tmdb']
+
+                try:
+                    movie_images = self.image_tmdb.get_movie_images(movie_id)
+                    poster_image = movie_images[0] if movie_images else "static/img/fondo_gris.jpg"
+                    
+                    # Agregar la información de la película a la lista
+                    movies_data.append({
+                        'title': movie_title,
+                        'year': movie_year,
+                        'poster_image': poster_image
+                    })
+                except ErrorFetchImage as e:
+                    print(f"Error al obtener imágenes para {movie_title}: {e}")
+
+        return movies_data
+    
+    
+    def get_recommended_list(self):
+        """Obtiene y almacena las películas prontas a estrenar en cine en una lista."""
+        cine_movies = self.get_recommended_movies()
+        movies_data = []  # Lista para almacenar los datos de las películas
+
+        if cine_movies:
+            for item in cine_movies[:10]:
+                movie_title = item['title']
+                movie_year = item['year']
+                movie_id = item['ids']['tmdb']
 
                 try:
                     movie_images = self.image_tmdb.get_movie_images(movie_id)
