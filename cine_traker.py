@@ -214,7 +214,7 @@ class User(TraktApi):
         movies_data = []  # Lista para almacenar los datos de las películas
 
         if trend_movies:
-            for item in trend_movies[:8]:
+            for item in trend_movies[:10]:
                 movie_title = item['movie']['title']
                 movie_year = item['movie']['year']
                 movie_id = item['movie']['ids']['tmdb']
@@ -233,7 +233,33 @@ class User(TraktApi):
                     print(f"Error al obtener imágenes para {movie_title}: {e}")
 
         return movies_data
-    
+
+    def get_favorited_list(self):
+        """Obtiene y almacena las películas YA VISTAS del usuario en una lista."""
+        fav_movies = self.get_favorited_movies()
+        movies_data = []  # Lista para almacenar los datos de las películas
+
+        if fav_movies:
+            for item in fav_movies:
+                movie_title = item['movie']['title']
+                movie_year = item['movie']['year']
+                movie_id = item['movie']['ids']['tmdb']
+
+                try:
+                    movie_images = self.image_tmdb.get_movie_images(movie_id)
+                    poster_image = movie_images[0] if movie_images else "static/img/fondo_gris.jpg"
+                    
+                    # Agregar la información de la película a la lista
+                    movies_data.append({
+                        'title': movie_title,
+                        'year': movie_year,
+                        'poster_image': poster_image
+                    })
+                except ErrorFetchImage as e:
+                    print(f"Error al obtener imágenes para {movie_title}: {e}")
+
+        return movies_data
+
     def get_name(self):
         info_user = self.get_profile()
         return info_user.get("name")

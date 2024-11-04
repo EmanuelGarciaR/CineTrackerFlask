@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Cine Traker{% endblock %}</title>
+    <title>Cine Traker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='CSS/base_main.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/CineTracker.JPG') }}">
     {% block additional_css %} <!--link adicional de css-->{% endblock %}
@@ -19,7 +19,7 @@
                 <li><a href="{{ url_for('watchlist') }}">Seguimiento</a></li>
                 <li><a href="{{ url_for('watchedlist') }}">Vistas</a></li>
                 <li><a href="{{ url_for('trendlist') }}">Tendencia</a></li>
-                <li><a href="#">Favoritas</a></li>
+                <li><a href="{{ url_for('favlist') }}">Favoritas</a></li>
                 <li><a href="#">OtraLista</a></li>
                 <li><a href="#">OtraLista</a></li>
                 <li><a href="#">OtraLista</a></li>

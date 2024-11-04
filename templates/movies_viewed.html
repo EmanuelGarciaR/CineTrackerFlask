@@ -1,6 +1,6 @@
 {% extends 'base_card_movie.html' %}
 
-{% set list_title = "Películas de Seguimiento" %}
+{% set list_title = {{movie.title}} %}
 
 {% block content %}
 {{ super() }}  <!-- Incluye el contenido de base_card_movie.html -->
