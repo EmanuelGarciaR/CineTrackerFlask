@@ -1,15 +1,22 @@
 # Movie Tracker App
 
-## Descripción
+## 1. Descripción
 
 Movie Tracker App es una aplicación diseñada para ayudarte a seguir el rastro de tus películas y series favoritas utilizando la API de Trakt. Permite a los usuarios iniciar sesión con su cuenta de Trakt y gestionar sus listas de contenido, así como leer y escribir reseñas.
 
-## Características
+### 2. Gestión de Listas de Películas
+- **Películas en seguimiento:** Obtiene la lista de películas por ver del usuario desde Trakt.
+- **Películas vistas:** Obtiene la lista de películas ya vistas por el usuario.
+- **Películas favoritas:** Obtiene las películas marcadas como favoritas.
+- **Películas en tendencia:** Muestra las películas que están en tendencia en la plataforma.
+- **Películas en cartelera:** Obtiene las películas actualmente en cartelera (Box Office).
+- **Películas próximas a estrenar:** Muestra las películas más anticipadas por estrenar.
+- **Películas relacionadas:** Muestra las películas relacionadas a Volver al futuro.
 
-- **Inicio de Sesión con Trakt**: Permite a los usuarios iniciar sesión utilizando su cuenta de Trakt.
-- **Listas Recomendadas**: Muestra listas de películas y series recomendadas basadas en los intereses del usuario.
-- **Listas Personales**: Los usuarios pueden crear y gestionar listas personalizadas como "Por Ver" y "Vistas".
-- **Reseñas**: Los usuarios pueden escribir y leer reseñas sobre películas y series.
-- **Interacción con Trakt API**: La aplicación se integra con la API de Trakt para recuperar información actualizada sobre películas y series.
+### 3. Imágenes de Películas
+- Utiliza la API de TMDb para obtener imágenes (posters) de las películas.
+- Si no se encuentra una imagen, se muestra una imagen predeterminada.
 
-## Instalación
+## Requisitos
+- Python 3.11
+- Una cuenta de Trakt.tv para la autenticación y acceso a los datos de películas.
