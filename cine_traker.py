@@ -84,7 +84,6 @@ class TraktApi:
         """Obtiene la lista de seguimiento del usuario"""
         user_info = self.get_user_info()
         user_id = user_info.get("user_id")
-        
         headers = self.get_headers()
         url = f"{self.API_URL}/users/{user_id}/watchlist/movies/rank"
         response = requests.get(url, headers=headers)
@@ -146,6 +145,19 @@ class TraktApi:
     
         if response.status_code == 200:
             return response.json()  # Lista de diccionarios con las películas favoritas
+        else:
+            raise ApiRequestError("Error al obtener la lista de películas próximas a estrenar", "error")
+
+    def get_related_movies(self)-> list[dict[str, str]] | None:
+        """Obtiene las películas relacionadas en colombia"""
+        user_info = self.get_user_info()
+        user_id = user_info.get("user_id")
+        headers = self.get_headers()
+        url = f"{self.API_URL}/movies/308/related"
+        response = requests.get(url, headers= headers)
+    
+        if response.status_code == 200:
+            return response.json()
         else:
             raise ApiRequestError("Error al obtener la lista de películas próximas a estrenar", "error")
 
@@ -344,8 +356,7 @@ class User(TraktApi):
                     print(f"Error al obtener imágenes para {movie_title}: {e}")
 
         return movies_data
-    
-    
+
     def get_recommended_list(self):
         """Obtiene y almacena las películas prontas a estrenar en cine en una lista."""
         cine_movies = self.get_recommended_movies()
@@ -372,27 +383,30 @@ class User(TraktApi):
 
         return movies_data
 
-    def get_name(self):
-        info_user = self.get_profile()
-        return info_user.get("name")
+    def get_related_list(self):
+        """Obtiene y almacena las películas relacionadas en una lista."""
+        related_movies = self.get_related_movies()
+        movies_data = []  # Lista para almacenar los datos de las películas
 
-    def show_list(self, list_name: str):
-        """Muestra la lista de películas solicitada."""
-        if list_name in self.lists:
-            return self.lists[list_name].show_movies()
-        else:
-            raise ListNotFoundError(f"La lista '{list_name}' no fue encontrada", "error")
+        if related_movies:
+            for item in related_movies[:10]:
+                movie_title = item['title']
+                movie_year = item['year']
+                movie_id = item['ids']['tmdb']
 
-
-    def show_all_lists(self):
-        """Muestra todas las listas de películas del usuario"""
-        all_lists = []  # Almacenamos las listas
-        for name, movie_list in self.lists.items(): #(name, movie_list)->Tupla
-            movies = movie_list.show_movies()  # Obtener las películas de la lista
-            all_lists.append({'name': name, 'movies': movies})  # Agregar a la lista acumulada
-        return all_lists
-
-
+                try:
+                    movie_images = self.image_tmdb.get_movie_images(movie_id)
+                    poster_image = movie_images[0] if movie_images else "static/img/fondo_gris.jpg"
+                    
+                    # Agregar la información de la película a la lista
+                    movies_data.append({
+                        'title': movie_title,
+                        'year': movie_year,
+                        'poster_image': poster_image
+                    })
+                except ErrorFetchImage as e:
+                    print(f"Error al obtener imágenes para {movie_title}: {e}")
+        return movies_data
 
 class Movie:
     """Representa una película con su título, año y poster."""
